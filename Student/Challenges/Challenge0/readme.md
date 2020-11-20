@@ -59,12 +59,12 @@ is for their data warehouse (OLAP).  You will need to setup both environments as
 
     /Student/Challenges/Challenge0/ARM.  
     The files are parametersFile.json and template.json.
-    Edit the parmeters file and replace any {} with your env. variables.  
+    Edit the parmeters file and replace any {} with information requested.  
 
 
 7. Run the last command to setup Azure Data Factory, SSIS Runtime, Vnet, and Azure SQL Database to host the SSIS catalog.  This will build out for Challenge one the SSIS environment in Azure Data Factory.
 
-        az container create -g {Resource Group Name} --name mdwhackdb --image alexk002/sqlserver2019_demo:1  --cpu 2 --memory 7 --ports 1433 --ip-address Public
+        az deployment group create --name final --resource-group {ENTER RESOURCE GROUP NAME} --template-file template.json --parameters parametersFile.json
 
 
 8. Last step and most important start your Azure Data Factory SSIS Runtime Service.  Go to [Connection pane](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-deploy-ssis-packages-azure#connections-pane) in your Azure Data Factory service.  Run before the kickoff presentation so it has enough time to start up before you start Challenge 1.  The startup time is approximately 30 minutes.
@@ -73,7 +73,7 @@ is for their data warehouse (OLAP).  You will need to setup both environments as
 10. Review the database catalog on the data warehouse for familiarity of the schema [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-dw-database-catalog?view=sql-server-ver15)
 
 
-9. Review ETL workflow to understand the data flow and architecture [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-perform-etl?view=sql-server-ver15)
+11. Review ETL workflow to understand the data flow and architecture [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-perform-etl?view=sql-server-ver15)
 
 
 ## On-premise Architecture

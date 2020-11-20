@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "dataFactoryName": {
-      "value": "ssiswth"
+      "value": "{Data Factory Name}"
     },
     "location": {
       "value": "[resourceGroup().location]"
     },
     "virtualNetworkName": {
-      "value": "ssiswth"
+      "value": "{Vnet Name}"
     },
     "subNetName": {
       "value": "default"
@@ -24,19 +24,19 @@
       "value": 1
     },
     "azureSqlServerName": {
-      "value": "ssiswthsvr"
+      "value": "{Database Server Name}"
     },
     "databaseAdminUsername": {
-      "value": "user"
+      "value": "{USERNAME}"
     },
     "databaseAdminPassword": {
-      "value": "password"
+      "value": "{PASSWORD}"
     },
     "catalogPricingTier": {
       "value": "Basic"
     },
     "databaseName": {
-      "value": "ssiswth"
+      "value": "{Database Name}"
     }
   }
 }
