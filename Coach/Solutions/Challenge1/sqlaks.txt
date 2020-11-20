@@ -1,0 +1,123 @@
+--Login
+az login
+
+--Subscription
+az account set --subscription "Internal Consumption"
+
+--Create Resource Group
+az group create --name "KubCloud" --location centralus
+
+--Create AKS Cluster
+az aks create     --resource-group "KubCloud"     --generate-ssh-keys     --name CSCluster     --node-count 3 #default Node count is 3
+
+--Save Credentials to localhost
+az aks get-credentials --resource-group "KubCloud" --name CSCluster
+
+--Download Contexts
+kubectl config get-contexts
+
+--View Nodes
+kubectl get nodes
+
+--View Namespaces
+kubectl get pods --all-namespaces
+
+--Save Secret for MSSQL login password
+kubectl create secret generic mssql --from-literal=SA_PASSWORD="yourpassword"
+
+--Create SQLServer2019.yaml file
+touch SQLServer2019.yaml
+nano SQLServer2019.yaml
+
+--YAML File
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: 'pvc-sql-system'
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: managed-premium
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mssql-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mssql
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mssql
+    spec:
+      securityContext:
+        fsGroup: 10001
+      containers:
+      - name: mssql
+        image: 'mcr.microsoft.com/mssql/server:2019-CU4-ubuntu-18.04'
+        ports:
+        - containerPort: 1433
+        env:
+        - name: ACCEPT_EULA
+          value: "Y"
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: mssql
+              key: SA_PASSWORD
+        volumeMounts:
+        - name: mssql-system
+          mountPath: /var/opt/mssql
+      volumes:
+      - name: mssql-system
+        persistentVolumeClaim:
+          claimName: pvc-sql-system
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: mssql-deployment
+spec:
+  selector:
+    app: mssql
+  ports:
+    - protocol: TCP
+      port: 31433
+      targetPort: 1433
+  type: LoadBalancer
+
+
+--Create instance
+kubectl apply -f SQLServer2019.yaml
+
+--Running services
+kubectl get service
+
+--Download bak file
+curl -L -o wwi.bak 'https://github.com/Microsoft/sql-server-samples/releases/download/wide-world-importers-v1.0/WideWorldImporters-Full.bak'
+
+--System variable for deployment
+kubectl get pods -o=name
+
+--Copy file to pod
+kubectl cp wwi.bak mssql-deployment-f5f7b76dd-df4d8:/var/opt/mssql
+
+--RESTORE Database
+sqlcmd -S 52.154.53.102,31433 -U sa -P "yourpassword" -Q "RESTORE DATABASE WideWorldImporters FROM DISK = '/var/opt/mssql/wwi.bak' WITH MOVE 'WWI_Primary' TO '/var/opt/mssql/data/WideWorldImporters.mdf', MOVE 'WWI_UserData' TO '/var/opt/mssql/data/WideWorldImporters_userdata.ndf', MOVE 'WWI_Log' TO '/var/opt/mssql/data/WideWorldImporters.ldf', MOVE 'WWI_InMemory_Data_1' TO '/var/opt/mssql/data/WideWorldImporters_InMemory_Data_1'"
+
+--Validate Data Restore
+sqlcmd -S 52.154.53.102,31433 -U sa -P "yourpassword" -Q "SELECT Name FROM sys.Databases"
+
+
+
+
+
+
