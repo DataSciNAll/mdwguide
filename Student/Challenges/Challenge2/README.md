@@ -12,45 +12,49 @@ The objective of this challenge is to build a Data Lake with Synapse Analytics o
 Prior to starting this challenge, you should ensure that there are changes in the City data captured from Wide World Importers OLTP Database.  Execute the script below to insert/change data in the source, and update necessary configuration values.
 
 1. Execute queries below in the Wide World Importers Database to update 10 existing records and insert 1 new record. 
-~~~~
-UPDATE T
-SET [LatestRecordedPopulation] = LatestRecordedPopulation + 1000
-FROM (SELECT TOP 10 * from [Application].[Cities]) T
 
-INSERT INTO [Application].[Cities]
-	(
-        [CityName]
-        ,[StateProvinceID]
-        ,[Location]
-        ,[LatestRecordedPopulation]
-        ,[LastEditedBy]
-	)
-    VALUES
-    (
-		'NewCity' + CONVERT(char(19), getdate(), 121)
-        ,1
-        ,NULL
-        , 1000
-        ,1
-	)
-;
+        UPDATE T
+        SET [LatestRecordedPopulation] = LatestRecordedPopulation + 1000
+        FROM (SELECT TOP 10 * from [Application].[Cities]) T
+
+        INSERT INTO [Application].[Cities]
+	    (
+            [CityName]
+            ,[StateProvinceID]
+            ,[Location]
+            ,[LatestRecordedPopulation]
+            ,[LastEditedBy]
+	    )
+        VALUES
+        (
+		    'NewCity' + CONVERT(char(19), getdate(), 121)
+            ,1
+            ,NULL
+            , 1000
+            ,1
+	    )
+        ;
+
+
 
 2. Modify the [Integration].[GetCityUpdates] stored procedure in the same OLTP database to remove the Location field from the result set returned.  
-~~~~
-SELECT [WWI City ID], City, [State Province], Country, Continent, [Sales Territory],
-           Region, Subregion,
 
-		   -- [Location] geography,                       -->Remove due to data type compatibility issues
+        SELECT [WWI City ID], City, [State Province], Country, Continent, [Sales Territory],
+                   Region, Subregion,
 
-		   [Latest Recorded Population], [Valid From],
-           [Valid To]
-    FROM #CityChanges
-    ORDER BY [Valid From];
+		            -- [Location] geography,                       -->Remove due to data type compatibility issues
 
-2. Execute the query below in the Azure Synapse SQL Pool to update the parameter used as the upper bound for the ELT process:
+		        [Latest Recorded Population], [Valid From],
+                [Valid To]
+        FROM #CityChanges
+        ORDER BY [Valid From];
 
-UPDATE INTEGRATION.LOAD_CONTROL
-SET LOAD_DATE = getdate()
+
+3. Execute the query below in the Azure Synapse SQL Pool to update the parameter used as the upper bound for the ELT process:
+
+        UPDATE INTEGRATION.LOAD_CONTROL
+        SET LOAD_DATE = getdate()
+
 
 ## Success Criteria
 1. Deploy a new storage account resource.
