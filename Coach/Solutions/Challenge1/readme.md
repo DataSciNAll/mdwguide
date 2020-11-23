@@ -10,23 +10,32 @@ be showcasing how to migrate your traditional SQL Server (SMP) to Azure Synapse 
 
 ## Environment Setup
 
-<b>Note: </b> Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentatino is missing.
+<b>Note: </b> Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentation is missing.
 
 WWI runs their existing database platforms on-premise with SQL Server 2017.  There are two databases samples for WWI.  The first one is for their Line of Business application (OLTP) and the second
-is for their data warehouse (OLAP).  You will need to setup both environments as our starting point in the migration.  Recommended to have students start Challenge 0 with setup of SQL VM before starting any presentations. This spin-up time is approx 30 mins and this will give you sufficient time to kick-off the event while their VMs are being setup.
+is for their data warehouse (OLAP).  You will need to setup both environments as our starting point in the migration.  Recommended to have students start Challenge 0 with setup of SQL environment before starting any presentations. 
 
-1. If you do not have a on-premise SQL Server 2017, you can provision a Azure Virtual Machine running SQL Server 2017 using this [Step by step guidance](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/sql/virtual-machines-windows-portal-sql-server-provision) Recommended size is DS12
-    * Turn off IE Enhanced Security Config in [Server Manager](https://medium.com/tensult/disable-internet-explorer-enhanced-security-configuration-in-windows-server-2019-a9cf5528be65)
-    * Go to Windows Firewall internal to the VM and open a inbound port to 1433. This is required for SSIS Runtime to access the database.
-    * Go to Network Security Group (Azure) and setup inbound ports with 1433
-2. Download both WWI databases (Enterprise Edition) to your on-premise SQL server or Azure VM you have just provisioned. [Download Link](https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0). Go to the section called, "SQL Server 2016 SP1 (or later) Any Edition aside from LocalDB; SQL Server 2016 RTM (or later) Evaluation/Developer/Enterprise Edition" and download the two bullets under this heading.
->The file names are WideWorldImporters-Full.bak and WideWorldImportersDW-Full.bak.  
->These two files are the OLTP and OLAP databases respectively.
-> Copy these two files to this directory on the Virtual machine C:\Program Files\Microsoft SQL Server\MSSQL14.MSSQLSERVER\MSSQL\Backup
-3. Follow this [Install and Configuration Instrution for the OLTP database](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-oltp-install-configure?view=sql-server-ver15)
-4. Follow this [Install and Configuration Instrution for the OLAP database](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-dw-install-configure?view=sql-server-ver15)
+1. Open your browser and login to your Azure Tenant.  We plan to setup the Azure Services required for the What the Hack (WTH).  In your portal, open the [Azure Cloud Shell](https://docs.microsoft.com/en-us/azure/cloud-shell/overview)
+
+2. Go into the cloud shell and select the subscription you plan to use for this WTH.
+
+        az account set --subscription {"Subscription Name"}
+        az account show
+
+
+3. Create a resource group to store the Modern Data Warehouse What the Hack.  This will be the services for your source systems/environments.  In Cloudshell, run this command
+
+        az group create --location eastus2 --name {"Resource Group Name"}
+
+
+4. In the Cloudshell, run this command to create a SQL Server instance and restore the databases.  This will create an Azure Container Instance and restore the WideWorldImporters and WideWorldImoprtersDW databases.  These two databases are your LOB databases for this hack.
+
+        az container create -g {Resource Group Name} --name mdwhackdb --image alexk002/sqlserver2019_demo:1  --cpu 2 --memory 7 --ports 1433 --ip-address Public
+
 5. Review the database catalog on the data warehouse for familiarity of the schema [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-dw-database-catalog?view=sql-server-ver15)
+
 6. Review ETL workflow to understand the data flow and architecture [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-perform-etl?view=sql-server-ver15)
+
 7. Create an Azure Synapse Analytics Data Warehouse with the lowest DWU [Step by step guidance](https://docs.microsoft.com/en-us/azure/synapse-analytics/sql-data-warehouse/create-data-warehouse-portal) Recommended size of Azure Synapse is DW100.
     * Add your client IP address to the firewall for Synapse
     * Ensure you are leveraging SQL Server Management STudio 18.x or higher
@@ -34,8 +43,9 @@ is for their data warehouse (OLAP).  You will need to setup both environments as
 ## Tools
 
 1. [SQL Server Management Studion (Version 18.x or higher)](https://docs.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms?view=sql-server-ver15)
-2. [Power BI Desktop](https://www.microsoft.com/en-us/download/details.aspx?id=58494)
-3. DataWarehouseMigrationUtility.zip (Located in the current directory. This is a Learning tool and not recommended or supported for actual migrations)
+2. [Visual Studio Code](https://code.visualstudio.com/Download) 
+3. [Power BI Desktop](https://www.microsoft.com/en-us/download/details.aspx?id=58494)
+4. DataWarehouseMigrationUtility.zip (Located in the current directory. This is a Learning tool and not recommended or supported for actual migrations)
 
 
 ## Migration Overview
@@ -64,7 +74,7 @@ on how best to distribute the data across each table follow this [document](http
 
 As a learning tool, the Data Warehouse migration utility can be a guided approach to migrating your schemas.  We suggest you run the tool to determine incompatibilities but actually generate the scripts by hand.  Here is [a set of instructions](https://www.sqlservercentral.com/articles/azure-dwh-part-11-data-warehouse-migration-utility) to follow to use the utility.  
 
-1. Go to Source database on the SQL Server VM and right click the WWI DW database and select "Generate Scripts".  This will export all DDL statements for the database tables and schema.
+1. Go to Source database on the SQL Server enviroment and right click the WWI DW database and select "Generate Scripts".  This will export all DDL statements for the database tables and schema.
 2. Create a user defined schema for each tier of the data warehouse; Integration, Dimension, Fact.
 3. Items that require refactoring (You can refer to this [document](https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-azure-sql-data-warehouse?view=aps-pdw-2016-au7) for more information)
     * Data types
