@@ -8,17 +8,17 @@ WWI importers realizes they need to further modernize their data warehouse and w
 ## Description
 The objective of this challenge is to build a Data Lake with Azure Data Lake Store (ADLS) Gen 2.  The Data Lake will be a staging area where all our source system data files reside. We need to ensure this Data Lake is well organized and doesn't turn into a swamp. This challenge will help us organize the folder structure and setup security to prevent unauthorized access.  Lastly, we will extract data from the WWI OLTP platform and store it in the Data Lake.  
 
-The OLTP platform is on-premise so you will need to build a hybrid archtiecture to integrate it into Azure.  Keep in mind that the pipeline that you build will become the <b>EXTRACT</b> portion of the new E-L-T process.  Based on requirements for this new process, you will need to be sure that changes can be captured on a daily basis.  Stored procedures have already been compiled in the source OLTP database, but they will require data parameters in order to be executed.  This means that the new pipeline will need to be able to generate and pass those parameters to the source.  The first requirement is to build a functional POC that is able to move a single dataset to the new ADLS Gen 2 data lake. Ideally, it would be nice to make the process table driven so that new pipelines do not need to be created for each additional table that needs to be copied. (Optional, sharing to give insights on end-state).
+The OLTP platform is on-premise so you will need to build a hybrid archtiecture to integrate it into Azure.  Keep in mind that the pipeline that you build will become the **EXTRACT** portion of the new E-L-T process.  Based on requirements for this new process, you will need to be sure that changes can be captured on a daily basis.  Stored procedures have already been compiled in the source OLTP database, but they will require data parameters in order to be executed.  This means that the new pipeline will need to be able to generate and pass those parameters to the source.  The first requirement is to build a functional POC that is able to move a single dataset to the new ADLS Gen 2 data lake. Ideally, it would be nice to make the process table driven so that new pipelines do not need to be created for each additional table that needs to be copied. (Optional, sharing to give insights on end-state).
 
 There are many adventures you can take on this Challenge and one of them can be to setup Synapse Analytics Workspace.  This will setup attached ADLS Gen2 storage along with the data pipelines.  You don't have to wait till Challenge 3 to get started.  When Synapse is GA, this would be the ideal path.
 
 
 ## Environment Setup
 
-<b>Note: </b> Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentation is missing.
+**Note:** Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentation is missing.
 
 1. Execute queries below in the Wide World Importers Database to update 10 existing records and insert 1 new record. 
-~~~~
+~~~
 UPDATE T
 SET [LatestRecordedPopulation] = LatestRecordedPopulation + 1000
 FROM (SELECT TOP 10 * from [Application].[Cities]) T
@@ -40,9 +40,11 @@ INSERT INTO [Application].[Cities]
         ,1
 	)
 ;
+~~~
 
 Modify the [Integration].[GetCityUpdates] stored procedure in the same OLTP database to remove the Location field from the result set returned.  
 
+~~~
 SELECT [WWI City ID], City, [State Province], Country, Continent, [Sales Territory],
            Region, Subregion,
 
@@ -53,7 +55,9 @@ SELECT [WWI City ID], City, [State Province], Country, Continent, [Sales Territo
     FROM #CityChanges
     ORDER BY [Valid From];
 ~~~~
+
 2. Execute the query below in the Azure Synapse DW database to update the parameter used as the upper bound for the ELT process:
+
 ~~~~
 UPDATE INTEGRATION.LOAD_CONTROL
 SET LOAD_DATE = getdate()
@@ -74,7 +78,7 @@ SET LOAD_DATE = getdate()
 6. Deploy a new Azure Data Factory resource in your subscription.  You can find a similar sample explained [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-hybrid-copy-data-tool).  
 <br><b>Note: steps below explain how to create applicable pipelines and activities in more detail.</b>
 
-7. Create a pipeline to copy data into ADLS. Keep in mind that this pipeline will serve as the <b>EXTRACT</b> portion of WWI's new ELT process.  There are stored procedures already present in the OLTP database that can be used to query the source data, but they will require start and end date parameters in order to be executed.
+7. Create a pipeline to copy data into ADLS. Keep in mind that this pipeline will serve as the **EXTRACT** portion of WWI's new ELT process.  There are stored procedures already present in the OLTP database that can be used to query the source data, but they will require start and end date parameters in order to be executed.
 
     - Using instructions found in [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-multiple-tables-portal#create-a-data-factory), access the Azure Data Factory UI and create necessary linked services, datasets, pipelines, and activities (Note: JSON for each of the objects below can be found in the resources folder).  
         - Linked Services:

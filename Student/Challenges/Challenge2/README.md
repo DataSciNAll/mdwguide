@@ -13,6 +13,7 @@ Prior to starting this challenge, you should ensure that there are changes in th
 
 1. Execute queries below in the Wide World Importers Database to update 10 existing records and insert 1 new record. 
 
+```
         UPDATE T
         SET [LatestRecordedPopulation] = LatestRecordedPopulation + 1000
         FROM (SELECT TOP 10 * from [Application].[Cities]) T
@@ -34,11 +35,12 @@ Prior to starting this challenge, you should ensure that there are changes in th
             ,1
 	    )
         ;
-
+```
 
 
 2. Modify the [Integration].[GetCityUpdates] stored procedure in the same OLTP database to remove the Location field from the result set returned.  
 
+```
         SELECT [WWI City ID], City, [State Province], Country, Continent, [Sales Territory],
                    Region, Subregion,
 
@@ -48,13 +50,14 @@ Prior to starting this challenge, you should ensure that there are changes in th
                 [Valid To]
         FROM #CityChanges
         ORDER BY [Valid From];
-
+```
 
 3. Execute the query below in the Azure Synapse SQL Pool to update the parameter used as the upper bound for the ELT process:
 
+```
         UPDATE INTEGRATION.LOAD_CONTROL
         SET LOAD_DATE = getdate()
-
+```
 
 ## Success Criteria
 1. Deploy a new storage account resource.
