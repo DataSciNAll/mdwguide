@@ -76,14 +76,15 @@ SET LOAD_DATE = getdate()
 5. Configure folder level security in your new data lake storage.  Supporting documentation for securing ADLS Gen 2 can be found [here](https://docs.microsoft.com/en-us/azure/storage/blobs/data-lake-storage-access-control). 
 
 6. Deploy a new Azure Data Factory resource in your subscription.  You can find a similar sample explained [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-hybrid-copy-data-tool).  
-<br><b>Note: steps below explain how to create applicable pipelines and activities in more detail.</b>
+<br>**Note: steps below explain how to create applicable pipelines and activities in more detail.**
 
 7. Create a pipeline to copy data into ADLS. Keep in mind that this pipeline will serve as the **EXTRACT** portion of WWI's new ELT process.  There are stored procedures already present in the OLTP database that can be used to query the source data, but they will require start and end date parameters in order to be executed.
 
     - Using instructions found in [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-multiple-tables-portal#create-a-data-factory), access the Azure Data Factory UI and create necessary linked services, datasets, pipelines, and activities (Note: JSON for each of the objects below can be found in the resources folder).  
         - Linked Services:
             - SQL Server connection for WideWorldImporters database  
-            <br><b>NOTE: you will need to create a new Self Hosted Integration Runtime IF your source SQL server is not open to the public. This is an advanced topic and not required for Challenge 2</b>
+            <br>**Note: you will need to create a new Self Hosted Integration Runtime IF your source SQL server is not open to the public. This is an advanced topic and not required for Challenge 2**
+
             - Azure Data Lake Gen 2
         - Datasets:
             - WideWorldImporters 
@@ -93,9 +94,12 @@ SET LOAD_DATE = getdate()
                     1. Create LOOKUP activities to query the DW and assign values for the last refresh time of the [City] table. Instructions can be found [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-portal)<br>
                     2. Create a COPY acitvity with properties below. Guide can be found [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-hybrid-copy-portal<br>
                         - > Source Dataset: WideWorldImporters - Stored Procedure [Integration].[GetCityUpdates]
-                        <br><b>Note: You will need to modify this stored procedure to ensure that the [Location] field is excluded from the results.  Otherwise this data will cause errors due to incompatibility with Azure Data Factory.  You can find the updated procedure in the Scripts folder in the attached Solution Guide.</b><br>
-                        - > Sink Dataset: ADLS Gen2 - IN\WWIDB\CITY\<br>
-                NOTE: by using expressions and parameters in Linked Services, Datasets, and source query, you can make this pipeline dynamic and reuse for all tables.  See example of this pattern [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-portal)
+                        <br>**Note: You will need to modify this stored procedure to ensure that the [Location] field is excluded from the results.  Otherwise this data will cause errors due to incompatibility with Azure Data Factory.  You can find the updated procedure in the Scripts folder in the attached Solution Guide.**<br>
+                        - > Sink Dataset: ADLS Gen2 - IN\WWIDB\CITY\  <br>
+                
+                **Note: by using expressions and parameters in Linked Services, Datasets, and source query, you can make this pipeline dynamic and reuse for all tables.**
+                
+                See example of this pattern [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-incremental-copy-portal)
                 
         - Create a 2nd pipeline with a ForEach Loop activity to iterate through the list of tables and execute Pipeline created above for each table.  A Guide describing how to implement this pattern can be found [here](https://docs.microsoft.com/en-us/azure/data-factory/tutorial-bulk-copy-portal).<br>
             - Activities:<br>

@@ -74,9 +74,9 @@ Prior to starting this challenge, you should ensure that there are changes in th
     - Lookup Activity that queries the [Integration].[ETL Cutoff Table] in your Synapse DW to get the last refresh date for the City data. This result will be used as the @LastCutoff parameter in your copy activity.  The LastCutoff is similar to your Start Date in a range query.
     - Lookup activity that queries [Integration].[Load Control] table in your Synapse DW to get the current refresh date. This result will be used as the @NewCutoff parameter in your copy activity. The NewCutoff is similar to your End Date in a range query.
     - Copy Data activity that uses the [Integration].[GetCityUpdates] stored procedure in your WideWorldImporters OLTP database as your source, and the .\IN\WWIDB\City\ directory as the sink 
-    <br><b>Note: You will need to modify this stored procedure to ensure that the [Location] field is excluded from the results.  Otherwise this data will cause errors due to incompatibility with Azure Data Factory</b>
+    <br>**Note: You will need to modify this stored procedure to ensure that the [Location] field is excluded from the results.  Otherwise this data will cause errors due to incompatibility with Azure Data Factory**
 6. Once you have executed your new pipeline, there should be a .txt file with the 11 updated records from the City table in the \In\WWIDB\City\ folder of your data lake.
-<br><b>Note: you can execute your new pipeline by clicking the "Debug" button or adding a trigger from the UI designer.</b>
+<br>**Note: you can execute your new pipeline by clicking the "Debug" button or adding a trigger from the UI designer.**
 
 ## Stage 2 Architecture
 ![The Solution diagram is described in the text following this diagram.](../../../images/Challenge2.png)

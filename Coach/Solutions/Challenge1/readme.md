@@ -10,7 +10,7 @@ be showcasing how to migrate your traditional SQL Server (SMP) to Azure Synapse 
 
 ## Environment Setup
 
-<b>Note: </b> Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentation is missing.
+**Note:** Until Synapse Analytics goes GA, the coach's notes and students guides will leverage the terms Azure Data Lake Store Gen2, Azure Data Factory and Azure Synapse Database.  These terms will be replaced with Linked Storage, Data Pipelines and SQL Pools respectively as the reference documentation is updated upon GA.  It is acceptable to use Synapse Analytics Workspace as one of the adventures. We did not explicitly mention it since supporting documentation is missing.
 
 WWI runs their existing database platforms on-premise with SQL Server 2017.  There are two databases samples for WWI.  The first one is for their Line of Business application (OLTP) and the second
 is for their data warehouse (OLAP).  You will need to setup both environments as our starting point in the migration.  Recommended to have students start Challenge 0 with setup of SQL environment before starting any presentations. 
@@ -33,7 +33,8 @@ az group create --location eastus2 --name {"Resource Group Name"}
 4. In the Cloudshell, run this command to create a SQL Server instance and restore the databases.  This will create an Azure Container Instance and restore the WideWorldImporters and WideWorldImoprtersDW databases.  These two databases are your LOB databases for this hack.
 
 ```
-az container create -g {Resource Group Name} --name mdwhackdb --image alexk002/sqlserver2019_demo:1  --cpu 2 --memory 7 --ports 1433 --ip-address Public
+az container create -g {Resource Group Name} --name mdwhackdb --image alexk002/sqlserver2019_demo:1  --cpu 2 --memory 7
+--ports 1433 --ip-address Public
 ```
 5. Review the database catalog on the data warehouse for familiarity of the schema [Reference document](https://docs.microsoft.com/en-us/sql/samples/wide-world-importers-dw-database-catalog?view=sql-server-ver15)
 

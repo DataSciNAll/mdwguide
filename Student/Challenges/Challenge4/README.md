@@ -18,7 +18,7 @@ Note: You can start the stream of data by executing script below in Azure Cloud 
 ``` 
 az container create -g [Resource Group Name] --name [container name] --image
 alexk002/wwiclickstreamgenerator:1 --environment-variables 'hostName'='[EH Host Name]'
-'sasKeyName'='RootManageSharedAccessKey' 'sasKeyValue'='[SAS Key]' 'eventHubName'='[Event Hub Name]' ```
+'sasKeyName'='RootManageSharedAccessKey' 'sasKeyValue'='[SAS Key]' 'eventHubName'='[Event Hub Name]' 
 ```
 
 ### Data Sink:
